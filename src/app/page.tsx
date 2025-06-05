@@ -1,3 +1,7 @@
+
+'use client';
+
+import { useState, useEffect } from 'react';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import HeroCarousel from '@/components/hero-carousel';
@@ -6,7 +10,8 @@ import InquiryForm from '@/components/inquiry-form';
 import SocialFeed from '@/components/social-feed';
 import WhyChooseUs from '@/components/why-choose-us';
 import Testimonials from '@/components/testimonials';
-import OurProcess from '@/components/our-process'; // Added import
+import OurProcess from '@/components/our-process';
+import PagePreloader from '@/components/page-preloader'; // New import
 import { generateDestinationSummary } from '@/ai/flows/destination-summary';
 import type { Destination, CarouselImage, SocialMediaPost, Testimonial } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -75,7 +80,7 @@ const MOCK_TESTIMONIALS: Testimonial[] = [
   {
     id: 't1',
     name: 'Sarah L.',
-    avatarSrc: 'https://placehold.co/100x100/E8F5E9/4CAF50.png', 
+    avatarSrc: 'https://placehold.co/100x100/E8F5E9/4CAF50.png',
     dataAiHint: 'happy customer',
     quote: "Wanderlust Portfolio planned the most incredible trip to Italy for our anniversary. Every detail was perfect, from the charming hotels to the unique local experiences. We can't wait to book with them again!",
     rating: 5,
@@ -84,7 +89,7 @@ const MOCK_TESTIMONIALS: Testimonial[] = [
   {
     id: 't2',
     name: 'David K.',
-    avatarSrc: 'https://placehold.co/100x100/E1F5FE/03A9F4.png', 
+    avatarSrc: 'https://placehold.co/100x100/E1F5FE/03A9F4.png',
     dataAiHint: 'satisfied client',
     quote: "Our family vacation to Japan was a dream come true, thanks to the meticulous planning by Wanderlust. They truly understood what we were looking for and exceeded all our expectations. Highly recommended!",
     rating: 5,
@@ -93,7 +98,7 @@ const MOCK_TESTIMONIALS: Testimonial[] = [
   {
     id: 't3',
     name: 'Maria G.',
-    avatarSrc: 'https://placehold.co/100x100/FFF3E0/FF9800.png', 
+    avatarSrc: 'https://placehold.co/100x100/FFF3E0/FF9800.png',
     dataAiHint: 'travel feedback',
     quote: "I was a bit overwhelmed with planning my solo backpacking trip through Southeast Asia, but Wanderlust Portfolio made it so easy and stress-free. Their expert advice and support were invaluable.",
     rating: 4.5,
@@ -101,8 +106,6 @@ const MOCK_TESTIMONIALS: Testimonial[] = [
   },
 ];
 
-
-// Helper component for consistent section styling
 const SectionWrapper = ({ id, title, children, className }: { id: string; title: string; children: React.ReactNode; className?: string }) => (
   <section id={id} className={`py-12 md:py-16 lg:py-20 px-4 md:px-6 ${className}`}>
     <div className="container mx-auto">
@@ -114,68 +117,153 @@ const SectionWrapper = ({ id, title, children, className }: { id: string; title:
   </section>
 );
 
-export default async function Home() {
-  const destinationsWithSummaries: Destination[] = await Promise.all(
-    MOCK_DESTINATIONS_RAW.map(async (dest) => {
-      try {
-        const summaryResult = await generateDestinationSummary({
-          destinationName: dest.name,
-          description: dest.fullDescription,
-          travelTips: dest.travelTips,
+export default function Home() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [destinationsWithSummaries, setDestinationsWithSummaries] = useState<Destination[]>([]);
+
+  useEffect(() => {
+    let isMounted = true;
+    let imageLoadFallbackTimeout: NodeJS.Timeout;
+
+    const loadContent = async () => {
+      // Fetch AI summaries
+      const summariesPromise = Promise.all(
+        MOCK_DESTINATIONS_RAW.map(async (dest) => {
+          try {
+            const summaryResult = await generateDestinationSummary({
+              destinationName: dest.name,
+              description: dest.fullDescription,
+              travelTips: dest.travelTips,
+            });
+            return { ...dest, aiSummary: summaryResult.summary };
+          } catch (error) {
+            console.error(`Failed to generate summary for ${dest.name}:`, error);
+            return { ...dest, aiSummary: `Discover the unique charm of ${dest.name}. Explore its famous landmarks: ${dest.attractions.join(', ')}, and enjoy activities like ${dest.activities.join(', ')}. A truly unforgettable experience awaits!` };
+          }
+        })
+      );
+
+      // Track hero image loading
+      const heroImages = MOCK_CAROUSEL_IMAGES.map(img => img.src);
+      let loadedImageCount = 0;
+      let heroImagesLoadedPromise: Promise<void>;
+
+      if (heroImages.length === 0) {
+        heroImagesLoadedPromise = Promise.resolve();
+      } else {
+        heroImagesLoadedPromise = new Promise((resolve) => {
+          heroImages.forEach(src => {
+            const img = new window.Image(); // Use window.Image for browser environment
+            img.src = src;
+            const onImageLoadOrError = () => {
+              loadedImageCount++;
+              if (loadedImageCount === heroImages.length) {
+                resolve();
+              }
+            };
+            img.onload = onImageLoadOrError;
+            img.onerror = onImageLoadOrError; // Count errors as "loaded" to not block forever
+          });
         });
-        return { ...dest, aiSummary: summaryResult.summary };
-      } catch (error) {
-        console.error(`Failed to generate summary for ${dest.name}:`, error);
-        return { ...dest, aiSummary: `Discover the unique charm of ${dest.name}. Explore its famous landmarks: ${dest.attractions.join(', ')}, and enjoy activities like ${dest.activities.join(', ')}. A truly unforgettable experience awaits!` };
       }
-    })
-  );
+      
+      // Fallback for image loading, in case some images never fire onload/onerror
+      imageLoadFallbackTimeout = setTimeout(() => {
+        if (isMounted && isLoading) {
+            console.warn("Image loading fallback timeout reached.");
+            if (loadedImageCount < heroImages.length) { // if not all images loaded yet
+                 // This will resolve the promise if it hasn't resolved yet
+                 // effectively saying "consider images loaded"
+                 // This part needs to be handled carefully if promise is already resolved or rejected
+            }
+        }
+      }, 7000); // 7 seconds max for hero images
+
+
+      try {
+        const [summarizedDestinations] = await Promise.all([
+          summariesPromise,
+          heroImagesLoadedPromise,
+        ]);
+        
+        if (isMounted) {
+          setDestinationsWithSummaries(summarizedDestinations);
+           // Add a small delay for preloader to be visible even if content loads fast
+          setTimeout(() => setIsLoading(false), 500);
+        }
+      } catch (error) {
+        console.error("Error loading page content:", error);
+        if (isMounted) {
+          // Set summaries with fallbacks if summariesPromise rejected but images loaded
+          // Or just proceed to hide loader if critical data failed
+          setDestinationsWithSummaries(MOCK_DESTINATIONS_RAW.map(dest => ({
+            ...dest,
+             aiSummary: `Error loading details for ${dest.name}. Please try again later.` 
+          })));
+          setTimeout(() => setIsLoading(false), 500);
+        }
+      } finally {
+         clearTimeout(imageLoadFallbackTimeout);
+      }
+    };
+
+    loadContent();
+
+    return () => {
+      isMounted = false;
+      clearTimeout(imageLoadFallbackTimeout);
+    };
+  }, []); // Run once on mount
+
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
-      <Header />
-      <main className="flex-grow">
-        <HeroCarousel images={MOCK_CAROUSEL_IMAGES} />
+    <>
+      <PagePreloader isLoading={isLoading} />
+      <div className={`flex flex-col min-h-screen bg-background ${isLoading ? 'opacity-0' : 'opacity-100 transition-opacity duration-700 ease-in-out delay-300'}`}>
+        <Header />
+        <main className="flex-grow">
+          <HeroCarousel images={MOCK_CAROUSEL_IMAGES} />
 
-        <section id="welcome" className="py-12 md:py-16 lg:py-20 px-4 md:px-6 text-center">
-          <div className="container mx-auto">
-            <h1 className="font-headline text-4xl md:text-5xl font-bold text-primary mb-4">
-              Your Journey Begins Here
-            </h1>
-            <p className="text-lg md:text-xl text-foreground max-w-3xl mx-auto mb-8">
-              Explore the world with Wanderlust Portfolio. We craft unforgettable journeys, curate unique experiences, and provide personalized travel plans. Let your adventure begin!
-            </p>
-            <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground">
-              <Link href="#destinations">Explore Destinations</Link>
-            </Button>
-          </div>
-        </section>
+          <section id="welcome" className="py-12 md:py-16 lg:py-20 px-4 md:px-6 text-center">
+            <div className="container mx-auto">
+              <h1 className="font-headline text-4xl md:text-5xl font-bold text-primary mb-4">
+                Your Journey Begins Here
+              </h1>
+              <p className="text-lg md:text-xl text-foreground max-w-3xl mx-auto mb-8">
+                Explore the world with Wanderlust Portfolio. We craft unforgettable journeys, curate unique experiences, and provide personalized travel plans. Let your adventure begin!
+              </p>
+              <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground">
+                <Link href="#destinations">Explore Destinations</Link>
+              </Button>
+            </div>
+          </section>
 
-        <SectionWrapper id="destinations" title="Popular Destinations">
-          <DestinationShowcase destinations={destinationsWithSummaries} />
-        </SectionWrapper>
+          <SectionWrapper id="destinations" title="Popular Destinations">
+            <DestinationShowcase destinations={destinationsWithSummaries} />
+          </SectionWrapper>
 
-        <SectionWrapper id="why-us" title="Why Choose Wanderlust Portfolio?" className="bg-muted/30">
-          <WhyChooseUs />
-        </SectionWrapper>
-        
-        <SectionWrapper id="our-process" title="How It Works">
-          <OurProcess />
-        </SectionWrapper>
+          <SectionWrapper id="why-us" title="Why Choose Wanderlust Portfolio?" className="bg-muted/30">
+            <WhyChooseUs />
+          </SectionWrapper>
+          
+          <SectionWrapper id="our-process" title="How It Works">
+            <OurProcess />
+          </SectionWrapper>
 
-        <SectionWrapper id="testimonials" title="What Our Travelers Say" className="bg-muted/30">
-          <Testimonials testimonials={MOCK_TESTIMONIALS} />
-        </SectionWrapper>
+          <SectionWrapper id="testimonials" title="What Our Travelers Say" className="bg-muted/30">
+            <Testimonials testimonials={MOCK_TESTIMONIALS} />
+          </SectionWrapper>
 
-        <SectionWrapper id="contact" title="Plan Your Next Adventure" className="bg-muted/50">
-          <InquiryForm />
-        </SectionWrapper>
+          <SectionWrapper id="contact" title="Plan Your Next Adventure" className="bg-muted/50">
+            <InquiryForm />
+          </SectionWrapper>
 
-        <SectionWrapper id="social" title="Follow Our Adventures">
-          <SocialFeed posts={MOCK_SOCIAL_POSTS} />
-        </SectionWrapper>
-      </main>
-      <Footer />
-    </div>
+          <SectionWrapper id="social" title="Follow Our Adventures">
+            <SocialFeed posts={MOCK_SOCIAL_POSTS} />
+          </SectionWrapper>
+        </main>
+        <Footer />
+      </div>
+    </>
   );
 }
