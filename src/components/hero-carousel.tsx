@@ -52,8 +52,10 @@ export default function HeroCarousel({ images, autoPlayInterval = 5000 }: HeroCa
         <div
           key={image.src}
           className={cn(
-            "absolute top-0 left-0 w-full h-full transition-opacity duration-1000 ease-in-out",
-            index === currentIndex ? "opacity-100 z-10" : "opacity-0 z-0"
+            "absolute top-0 left-0 w-full h-full transition-all duration-1000 ease-in-out transform-gpu",
+            index === currentIndex
+              ? "opacity-100 scale-100 z-10"
+              : "opacity-0 scale-105 z-0"
           )}
         >
           <Image
