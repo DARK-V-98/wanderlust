@@ -1,3 +1,4 @@
+
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Briefcase, Users, Award } from 'lucide-react'; // Example icons
@@ -37,15 +38,18 @@ export default function WhyChooseUs() {
       </p>
       <div className="grid md:grid-cols-3 gap-8">
         {features.map((feature) => (
-          <Card key={feature.title} className="group overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col">
-            <div className="relative w-full h-72 overflow-hidden"> {/* Increased height from h-64 to h-72 */}
+          <Card 
+            key={feature.title} 
+            className="group overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col bg-card/80 backdrop-blur-sm border-white/30"
+          >
+            <div className="relative w-full h-72 overflow-hidden rounded-t-lg"> {/* Added rounded-t-lg here */}
               <Image
                 src={feature.imageSrc}
                 alt={feature.altText}
                 layout="fill"
                 objectFit="cover"
                 data-ai-hint={feature.dataAiHint}
-                className="transition-transform duration-300 ease-in-out group-hover:scale-105" /* Added hover scale effect */
+                className="transition-transform duration-300 ease-in-out group-hover:scale-105"
               />
             </div>
             <CardHeader>
