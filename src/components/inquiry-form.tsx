@@ -88,14 +88,14 @@ export default function InquiryForm() {
           <div className="mb-8 md:mb-0 text-center md:text-left">
             <h3 className="text-3xl font-bold mb-3 font-headline text-primary">Send us a message</h3>
             <p className="text-muted-foreground text-sm mb-2">
-              We&apos;re all ears (and a few corns 🌽).
+              We&apos;re all ears.
             </p>
             <p className="text-muted-foreground text-sm mb-6">
               Send us a message and we&apos;ll hit you back faster than you can say &quot;Toodles!&quot;
             </p>
             <div className="relative w-full max-w-[250px] mx-auto md:mx-0 aspect-[250/200]">
               <Image
-                src="https://placehold.co/250x200.png"
+                src="/cont.png"
                 alt="Contact envelope icon"
                 layout="fill"
                 objectFit="contain"
@@ -172,5 +172,4 @@ export default function InquiryForm() {
     </Card>
   );
 }
-
     
