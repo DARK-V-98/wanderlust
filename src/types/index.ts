@@ -28,3 +28,13 @@ export interface SocialMediaPost {
   caption: string;
   link: string;
 }
+
+export interface Testimonial {
+  id: string;
+  name: string;
+  avatarSrc: string;
+  dataAiHint?: string;
+  quote: string;
+  rating: number; // 1-5
+  location?: string;
+}

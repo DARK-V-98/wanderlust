@@ -5,8 +5,9 @@ import DestinationShowcase from '@/components/destination-showcase';
 import InquiryForm from '@/components/inquiry-form';
 import SocialFeed from '@/components/social-feed';
 import WhyChooseUs from '@/components/why-choose-us';
+import Testimonials from '@/components/testimonials'; // Added import
 import { generateDestinationSummary } from '@/ai/flows/destination-summary';
-import type { Destination, CarouselImage, SocialMediaPost } from '@/types';
+import type { Destination, CarouselImage, SocialMediaPost, Testimonial } from '@/types';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
@@ -69,6 +70,37 @@ const MOCK_SOCIAL_POSTS: SocialMediaPost[] = [
   { id: '5', imageUrl: 'https://placehold.co/300x300/03A9F4/FFFFFF.png', dataAiHint: 'underwater snorkeling', caption: 'Exploring underwater', link: '#' },
 ];
 
+const MOCK_TESTIMONIALS: Testimonial[] = [
+  {
+    id: 't1',
+    name: 'Sarah L.',
+    avatarSrc: 'https://placehold.co/100x100/E8F5E9/4CAF50.png', // Placeholder avatar
+    dataAiHint: 'happy customer',
+    quote: "Wanderlust Portfolio planned the most incredible trip to Italy for our anniversary. Every detail was perfect, from the charming hotels to the unique local experiences. We can't wait to book with them again!",
+    rating: 5,
+    location: 'New York, USA',
+  },
+  {
+    id: 't2',
+    name: 'David K.',
+    avatarSrc: 'https://placehold.co/100x100/E1F5FE/03A9F4.png', // Placeholder avatar
+    dataAiHint: 'satisfied client',
+    quote: "Our family vacation to Japan was a dream come true, thanks to the meticulous planning by Wanderlust. They truly understood what we were looking for and exceeded all our expectations. Highly recommended!",
+    rating: 5,
+    location: 'London, UK',
+  },
+  {
+    id: 't3',
+    name: 'Maria G.',
+    avatarSrc: 'https://placehold.co/100x100/FFF3E0/FF9800.png', // Placeholder avatar
+    dataAiHint: 'travel feedback',
+    quote: "I was a bit overwhelmed with planning my solo backpacking trip through Southeast Asia, but Wanderlust Portfolio made it so easy and stress-free. Their expert advice and support were invaluable.",
+    rating: 4.5,
+    location: 'Sydney, Australia',
+  },
+];
+
+
 // Helper component for consistent section styling
 const SectionWrapper = ({ id, title, children, className }: { id: string; title: string; children: React.ReactNode; className?: string }) => (
   <section id={id} className={`py-12 md:py-16 lg:py-20 px-4 md:px-6 ${className}`}>
@@ -125,6 +157,10 @@ export default async function Home() {
 
         <SectionWrapper id="why-us" title="Why Choose Wanderlust Portfolio?">
           <WhyChooseUs />
+        </SectionWrapper>
+
+        <SectionWrapper id="testimonials" title="What Our Travelers Say" className="bg-muted/30">
+          <Testimonials testimonials={MOCK_TESTIMONIALS} />
         </SectionWrapper>
 
         <SectionWrapper id="contact" title="Plan Your Next Adventure" className="bg-muted/50">
