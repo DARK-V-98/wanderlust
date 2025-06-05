@@ -5,7 +5,8 @@ import DestinationShowcase from '@/components/destination-showcase';
 import InquiryForm from '@/components/inquiry-form';
 import SocialFeed from '@/components/social-feed';
 import WhyChooseUs from '@/components/why-choose-us';
-import Testimonials from '@/components/testimonials'; // Added import
+import Testimonials from '@/components/testimonials';
+import OurProcess from '@/components/our-process'; // Added import
 import { generateDestinationSummary } from '@/ai/flows/destination-summary';
 import type { Destination, CarouselImage, SocialMediaPost, Testimonial } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -32,7 +33,7 @@ const MOCK_DESTINATIONS_RAW: Omit<Destination, 'aiSummary'>[] = [
     localCulture: 'Rich artistic heritage, café culture, haute couture.',
     rating: 4.8,
     reviewsCount: 1250,
-    travelTips: 'Use the metro for easy transport. Book popular attractions in advance. Try local pastries.'
+    travelTips: 'Use the metro for easy transport. Book popular attractions in advance. Try local pastries like croissants and macarons.'
   },
   {
     id: 'tokyo',
@@ -45,7 +46,7 @@ const MOCK_DESTINATIONS_RAW: Omit<Destination, 'aiSummary'>[] = [
     localCulture: 'Blend of ancient traditions and futuristic technology, vibrant pop culture.',
     rating: 4.9,
     reviewsCount: 1500,
-    travelTips: 'Get a Japan Rail Pass if traveling extensively. Learn basic Japanese phrases. Carry cash as not all places accept cards.'
+    travelTips: 'Get a Japan Rail Pass if traveling extensively. Learn basic Japanese phrases (e.g., "Konnichiwa", "Arigato"). Carry cash as not all places accept cards.'
   },
   {
     id: 'rome',
@@ -74,7 +75,7 @@ const MOCK_TESTIMONIALS: Testimonial[] = [
   {
     id: 't1',
     name: 'Sarah L.',
-    avatarSrc: 'https://placehold.co/100x100/E8F5E9/4CAF50.png', // Placeholder avatar
+    avatarSrc: 'https://placehold.co/100x100/E8F5E9/4CAF50.png', 
     dataAiHint: 'happy customer',
     quote: "Wanderlust Portfolio planned the most incredible trip to Italy for our anniversary. Every detail was perfect, from the charming hotels to the unique local experiences. We can't wait to book with them again!",
     rating: 5,
@@ -83,7 +84,7 @@ const MOCK_TESTIMONIALS: Testimonial[] = [
   {
     id: 't2',
     name: 'David K.',
-    avatarSrc: 'https://placehold.co/100x100/E1F5FE/03A9F4.png', // Placeholder avatar
+    avatarSrc: 'https://placehold.co/100x100/E1F5FE/03A9F4.png', 
     dataAiHint: 'satisfied client',
     quote: "Our family vacation to Japan was a dream come true, thanks to the meticulous planning by Wanderlust. They truly understood what we were looking for and exceeded all our expectations. Highly recommended!",
     rating: 5,
@@ -92,7 +93,7 @@ const MOCK_TESTIMONIALS: Testimonial[] = [
   {
     id: 't3',
     name: 'Maria G.',
-    avatarSrc: 'https://placehold.co/100x100/FFF3E0/FF9800.png', // Placeholder avatar
+    avatarSrc: 'https://placehold.co/100x100/FFF3E0/FF9800.png', 
     dataAiHint: 'travel feedback',
     quote: "I was a bit overwhelmed with planning my solo backpacking trip through Southeast Asia, but Wanderlust Portfolio made it so easy and stress-free. Their expert advice and support were invaluable.",
     rating: 4.5,
@@ -125,7 +126,6 @@ export default async function Home() {
         return { ...dest, aiSummary: summaryResult.summary };
       } catch (error) {
         console.error(`Failed to generate summary for ${dest.name}:`, error);
-        // Fallback summary in case AI fails
         return { ...dest, aiSummary: `Discover the unique charm of ${dest.name}. Explore its famous landmarks: ${dest.attractions.join(', ')}, and enjoy activities like ${dest.activities.join(', ')}. A truly unforgettable experience awaits!` };
       }
     })
@@ -155,8 +155,12 @@ export default async function Home() {
           <DestinationShowcase destinations={destinationsWithSummaries} />
         </SectionWrapper>
 
-        <SectionWrapper id="why-us" title="Why Choose Wanderlust Portfolio?">
+        <SectionWrapper id="why-us" title="Why Choose Wanderlust Portfolio?" className="bg-muted/30">
           <WhyChooseUs />
+        </SectionWrapper>
+        
+        <SectionWrapper id="our-process" title="How It Works">
+          <OurProcess />
         </SectionWrapper>
 
         <SectionWrapper id="testimonials" title="What Our Travelers Say" className="bg-muted/30">
