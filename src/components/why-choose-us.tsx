@@ -37,14 +37,15 @@ export default function WhyChooseUs() {
       </p>
       <div className="grid md:grid-cols-3 gap-8">
         {features.map((feature) => (
-          <Card key={feature.title} className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col">
-            <div className="relative w-full h-64">
+          <Card key={feature.title} className="group overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col">
+            <div className="relative w-full h-72 overflow-hidden"> {/* Increased height from h-64 to h-72 */}
               <Image
                 src={feature.imageSrc}
                 alt={feature.altText}
                 layout="fill"
                 objectFit="cover"
                 data-ai-hint={feature.dataAiHint}
+                className="transition-transform duration-300 ease-in-out group-hover:scale-105" /* Added hover scale effect */
               />
             </div>
             <CardHeader>
