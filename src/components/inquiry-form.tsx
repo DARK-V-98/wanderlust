@@ -1,10 +1,10 @@
 "use client";
 
-import { useFormState, useFormStatus } from 'react-dom';
+import { useFormStatus } from 'react-dom';
+import { useActionState, useEffect } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useEffect } from 'react';
 
 import { Button } from "@/components/ui/button";
 import {
@@ -56,7 +56,7 @@ function SubmitButton() {
 }
 
 export default function InquiryForm() {
-  const [state, formAction] = useFormState(submitInquiry, initialState);
+  const [state, formAction] = useActionState(submitInquiry, initialState);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
