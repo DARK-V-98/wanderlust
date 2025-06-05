@@ -45,22 +45,23 @@ export default function WhyChooseUs() {
       <div className="flex flex-col md:flex-row md:items-start md:justify-center gap-8">
         {features.map((feature, index) => {
           const isActive = activeIndex === index;
-          const anyActive = activeIndex !== null;
+          
+          let orderClass = `md:order-${index + 1}`; // Default order
 
-          let orderClass = '';
-          if (!anyActive) {
-            orderClass = `md:order-${index + 1}`;
-          } else {
-            if (isActive) {
-              orderClass = 'md:order-2';
-            } else {
-              // Determine order for non-active cards when one is active
-              if (activeIndex === 0) { // Leftmost card is active
-                orderClass = (index === 1) ? 'md:order-1' : 'md:order-3';
-              } else if (activeIndex === 1) { // Middle card is active
-                orderClass = (index === 0) ? 'md:order-1' : 'md:order-3';
-              } else if (activeIndex === 2) { // Rightmost card is active
-                orderClass = (index === 0) ? 'md:order-1' : 'md:order-3';
+          if (activeIndex !== null) { // If a card is active
+            if (isActive) { // If this is the active card
+              orderClass = 'md:order-2'; // Active card always goes to the middle slot
+            } else { // This is a non-active card
+              // Determine order for non-active cards based on active card's original position
+              if (activeIndex === 0) { // Leftmost card (original index 0) is active
+                // Current non-active card is original index 1 or 2
+                orderClass = (index === 1) ? 'md:order-3' : 'md:order-1'; // Original middle (1) goes right, original right (2) goes left
+              } else if (activeIndex === 1) { // Middle card (original index 1) is active
+                // Current non-active card is original index 0 or 2
+                orderClass = (index === 0) ? 'md:order-1' : 'md:order-3'; // Original left (0) stays left, original right (2) stays right
+              } else { // activeIndex === 2: Rightmost card (original index 2) is active
+                // Current non-active card is original index 0 or 1
+                orderClass = (index === 0) ? 'md:order-3' : 'md:order-1'; // Original left (0) goes right, original middle (1) goes left
               }
             }
           }
@@ -75,13 +76,15 @@ export default function WhyChooseUs() {
               onFocus={() => setActiveIndex(index)}
               onBlur={() => setActiveIndex(null)}
               className={cn(
-                "group overflow-hidden shadow-lg flex flex-col bg-card/80 backdrop-blur-sm border-white/30 transition-all transform duration-300 ease-in-out cursor-pointer",
+                "group overflow-hidden shadow-lg flex flex-col bg-card/80 backdrop-blur-sm border-white/30 transform duration-300 ease-in-out cursor-pointer",
+                "transition-transform transition-opacity", // Specific transitions
                 "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
                 orderClass,
-                isActive ? 'scale-110 z-20' : (anyActive ? 'scale-90 opacity-75 z-10 md:opacity-60' : 'scale-100 z-0'),
-                // On mobile (flex-col), ensure active card is prominent but others are still visible
-                isActive && !anyActive && 'z-0', // Default state for non-md screens
-                anyActive && !isActive && 'opacity-75' 
+                isActive 
+                  ? 'scale-110 z-20 opacity-100' 
+                  : (activeIndex !== null 
+                      ? 'scale-90 opacity-75 md:opacity-60 z-10' 
+                      : 'scale-100 opacity-100 z-0')
               )}
             >
               <div className="relative w-full h-72 overflow-hidden rounded-t-lg">
@@ -91,7 +94,7 @@ export default function WhyChooseUs() {
                   layout="fill"
                   objectFit="cover"
                   data-ai-hint={feature.dataAiHint}
-                  className="transition-transform duration-300 ease-in-out" // Removed group-hover:scale-105
+                  className="transition-transform duration-300 ease-in-out"
                 />
               </div>
               <CardHeader>
