@@ -15,7 +15,7 @@ export default function Footer() {
     <footer className="bg-muted py-8 text-muted-foreground">
       <div className="container mx-auto px-4 md:px-6 flex flex-col md:flex-row items-center justify-between">
         <p className="text-sm mb-4 md:mb-0">
-          &copy; {currentYear} Wanderlust Portfolio. All rights reserved.
+          &copy; {currentYear} Wanderlust Portfolio. All rights reserved. Made By ESystemLk (Vishwa Vidarshana).
         </p>
         <div className="flex items-center space-x-4">
           {socialLinks.map(({ Icon, href, label }) => (
