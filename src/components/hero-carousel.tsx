@@ -1,9 +1,10 @@
+
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
+import type { CarouselImage } from '@/types';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight, Circle } from 'lucide-react';
-import type { CarouselImage } from '@/types';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -14,20 +15,25 @@ interface HeroCarouselProps {
 
 export default function HeroCarousel({ images, autoPlayInterval = 5000 }: HeroCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [previousIndex, setPreviousIndex] = useState<number | null>(null);
+  const [slideDirection, setSlideDirection] = useState<'next' | 'prev' | null>(null);
 
   const goToPrevious = useCallback(() => {
-    const isFirstSlide = currentIndex === 0;
-    const newIndex = isFirstSlide ? images.length - 1 : currentIndex - 1;
-    setCurrentIndex(newIndex);
+    setSlideDirection('prev');
+    setPreviousIndex(currentIndex);
+    setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
   }, [currentIndex, images.length]);
 
   const goToNext = useCallback(() => {
-    const isLastSlide = currentIndex === images.length - 1;
-    const newIndex = isLastSlide ? 0 : currentIndex + 1;
-    setCurrentIndex(newIndex);
+    setSlideDirection('next');
+    setPreviousIndex(currentIndex);
+    setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
   }, [currentIndex, images.length]);
 
   const goToSlide = (slideIndex: number) => {
+    if (slideIndex === currentIndex) return;
+    setSlideDirection(slideIndex > currentIndex ? 'next' : 'prev');
+    setPreviousIndex(currentIndex);
     setCurrentIndex(slideIndex);
   };
 
@@ -40,7 +46,7 @@ export default function HeroCarousel({ images, autoPlayInterval = 5000 }: HeroCa
 
   if (!images || images.length === 0) {
     return (
-      <div className="h-[60vh] md:h-[80vh] flex items-center justify-center bg-muted text-muted-foreground">
+      <div className="h-[60vh] md:h-[calc(100vh-4rem)] flex items-center justify-center bg-muted text-muted-foreground">
         No images available for carousel.
       </div>
     );
@@ -54,8 +60,17 @@ export default function HeroCarousel({ images, autoPlayInterval = 5000 }: HeroCa
           className={cn(
             "absolute top-0 left-0 w-full h-full transition-all duration-1000 ease-in-out transform-gpu",
             index === currentIndex
-              ? "opacity-100 scale-100 z-10"
-              : "opacity-0 scale-105 z-0"
+              ? "opacity-100 scale-100 translate-x-0 z-10" // Active: centered, normal scale
+              : (index === previousIndex && previousIndex !== null) // Exiting slide
+                ? (slideDirection === 'next'
+                    ? "opacity-0 scale-110 -translate-x-full z-0" // Exiting left, zoom out
+                    : "opacity-0 scale-110 translate-x-full z-0"  // Exiting right, zoom out
+                  )
+                // Hidden slides (neither active nor exiting)
+                : (slideDirection === 'next' || slideDirection === null || previousIndex === null) 
+                  // Default to hidden right if going next, initial, or no previous (first load state for non-actives)
+                  ? "opacity-0 scale-90 translate-x-full z-0" // Hidden right, smaller
+                  : "opacity-0 scale-90 -translate-x-full z-0" // Hidden left, smaller (context is 'prev')
           )}
         >
           <Image
@@ -145,11 +160,13 @@ export default function HeroCarousel({ images, autoPlayInterval = 5000 }: HeroCa
         }
         .animate-fade-in-down {
           animation: fade-in-down 0.8s ease-out forwards;
+          animation-delay: 0.5s; /* Delay to sync with slide transition */
         }
         .animate-fade-in-up {
-          animation: fade-in-up 0.8s ease-out 0.3s forwards;
+          animation: fade-in-up 0.8s ease-out 0.8s forwards; /* Delay to sync with slide transition */
         }
       `}</style>
     </div>
   );
 }
+
