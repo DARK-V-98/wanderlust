@@ -1,10 +1,11 @@
+
 "use server";
 import { z } from "zod";
 
 const inquirySchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   email: z.string().email({ message: "Invalid email address." }),
-  destination: z.string().optional(),
+  subject: z.string().min(2, { message: "Subject must be at least 2 characters." }),
   message: z.string().min(10, { message: "Message must be at least 10 characters." }),
 });
 
@@ -13,7 +14,7 @@ export type InquiryFormState = {
   errors?: {
     name?: string[];
     email?: string[];
-    destination?: string[];
+    subject?: string[];
     message?: string[];
   };
   data?: z.infer<typeof inquirySchema>;
@@ -44,3 +45,5 @@ export async function submitInquiry(prevState: InquiryFormState, formData: FormD
     success: true,
   };
 }
+
+    
