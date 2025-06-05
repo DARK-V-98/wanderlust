@@ -103,7 +103,7 @@ export default function HeroCarousel({ images, autoPlayInterval = 5000 }: HeroCa
             variant="ghost"
             size="icon"
             onClick={goToPrevious}
-            className="absolute top-1/2 left-4 transform -translate-y-1/2 z-20 text-white bg-black/30 hover:bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            className="absolute top-1/2 left-4 transform -translate-y-1/2 z-20 text-white bg-black/30 hover:bg-black/50 opacity-70 hover:opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300"
             aria-label="Previous slide"
           >
             <ChevronLeft className="h-8 w-8" />
@@ -112,7 +112,7 @@ export default function HeroCarousel({ images, autoPlayInterval = 5000 }: HeroCa
             variant="ghost"
             size="icon"
             onClick={goToNext}
-            className="absolute top-1/2 right-4 transform -translate-y-1/2 z-20 text-white bg-black/30 hover:bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            className="absolute top-1/2 right-4 transform -translate-y-1/2 z-20 text-white bg-black/30 hover:bg-black/50 opacity-70 hover:opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300"
             aria-label="Next slide"
           >
             <ChevronRight className="h-8 w-8" />
