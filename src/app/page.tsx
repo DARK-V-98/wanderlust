@@ -4,22 +4,26 @@ import HeroCarousel from '@/components/hero-carousel';
 import DestinationShowcase from '@/components/destination-showcase';
 import InquiryForm from '@/components/inquiry-form';
 import SocialFeed from '@/components/social-feed';
+import WhyChooseUs from '@/components/why-choose-us';
 import { generateDestinationSummary } from '@/ai/flows/destination-summary';
 import type { Destination, CarouselImage, SocialMediaPost } from '@/types';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
 const MOCK_CAROUSEL_IMAGES: CarouselImage[] = [
-  { src: 'https://placehold.co/1920x1080/42A5F5/FFFFFF.png', alt: 'Beautiful mountain range', dataAiHint: 'mountain landscape', headline: "Discover Majestic Mountains", caption: "Experience breathtaking views and serene nature." },
-  { src: 'https://placehold.co/1920x1080/26A69A/FFFFFF.png', alt: 'Tropical beach paradise', dataAiHint: 'beach sunset', headline: "Relax on Sunny Beaches", caption: "Golden sands and crystal clear waters await you." },
-  { src: 'https://placehold.co/1920x1080/FFA726/FFFFFF.png', alt: 'Historic city street', dataAiHint: 'city architecture', headline: "Explore Historic Cities", caption: "Walk through centuries of history and culture." },
+  { src: '/1.jpg', alt: 'Breathtaking landscape view', dataAiHint: 'adventure landscape', headline: "Explore New Horizons", caption: "Your next adventure is just a click away." },
+  { src: '/2.jpg', alt: 'Traveler exploring a vibrant market', dataAiHint: 'travel discovery', headline: "Unforgettable Journeys", caption: "Crafting memories that last a lifetime." },
+  { src: '/3.jpg', alt: 'Serene natural wonder', dataAiHint: 'nature wonder', headline: "World of Wonders", caption: "Discover the beauty our planet has to offer." },
+  { src: '/4.jpg', alt: 'Modern cityscape contrasting with natural beauty', dataAiHint: 'city nature', headline: "City Escapes & Nature Retreats", caption: "From bustling metropolises to serene landscapes." },
+  { src: '/5.jpg', alt: 'Personalized travel map with pins', dataAiHint: 'custom travel', headline: "Personalized Adventures", caption: "Trips tailored to your dreams." },
+  { src: '/6.jpg', alt: 'Happy couple enjoying a seamless travel experience', dataAiHint: 'easy travel', headline: "Seamless Travel Experiences", caption: "We handle the details, you enjoy the journey." },
 ];
 
 const MOCK_DESTINATIONS_RAW: Omit<Destination, 'aiSummary'>[] = [
   {
     id: 'paris',
     name: 'Paris, France',
-    image: 'https://placehold.co/600x400/42A5F5/FFFFFF.png',
+    image: '/par.jpg',
     dataAiHint: 'Paris EiffelTower',
     fullDescription: 'Paris, the capital of France, is a major European city and a global center for art, fashion, gastronomy and culture. Its 19th-century cityscape is crisscrossed by wide boulevards and the River Seine.',
     attractions: ['Eiffel Tower', 'Louvre Museum', 'Notre Dame'],
@@ -32,8 +36,8 @@ const MOCK_DESTINATIONS_RAW: Omit<Destination, 'aiSummary'>[] = [
   {
     id: 'tokyo',
     name: 'Tokyo, Japan',
-    image: 'https://placehold.co/600x400/26A69A/FFFFFF.png',
-    dataAiHint: 'Tokyo skyline',
+    image: '/japan.jpg',
+    dataAiHint: 'Tokyo temple',
     fullDescription: 'Tokyo, Japan’s busy capital, mixes the ultramodern and the traditional, from neon-lit skyscrapers to historic temples. The opulent Meiji Shinto Shrine is known for its towering gate and surrounding woods.',
     attractions: ['Shibuya Crossing', 'Tokyo Skytree', 'Senso-ji Temple'],
     activities: ['Sushi Making Class', 'Explore Akihabara', 'Visit Ghibli Museum'],
@@ -45,7 +49,7 @@ const MOCK_DESTINATIONS_RAW: Omit<Destination, 'aiSummary'>[] = [
   {
     id: 'rome',
     name: 'Rome, Italy',
-    image: 'https://placehold.co/600x400/FFA726/FFFFFF.png',
+    image: '/rome.jpg',
     dataAiHint: 'Rome Colosseum',
     fullDescription: 'Rome, Italy’s capital, is a sprawling, cosmopolitan city with nearly 3,000 years of globally influential art, architecture and culture on display. Ancient ruins such as the Forum and the Colosseum evoke the power of the former Roman Empire.',
     attractions: ['Colosseum', 'Roman Forum', 'Vatican City'],
@@ -117,6 +121,10 @@ export default async function Home() {
 
         <SectionWrapper id="destinations" title="Popular Destinations">
           <DestinationShowcase destinations={destinationsWithSummaries} />
+        </SectionWrapper>
+
+        <SectionWrapper id="why-us" title="Why Choose Wanderlust Portfolio?">
+          <WhyChooseUs />
         </SectionWrapper>
 
         <SectionWrapper id="contact" title="Plan Your Next Adventure" className="bg-muted/50">
